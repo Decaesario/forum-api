@@ -12,6 +12,10 @@ const createServer = async (container) => {
 
   app.use(express.json());
 
+  app.get('/', (req, res) => {
+    res.status(200).json({ data: 'Hello world!' });
+  });
+
   app.use('/users', users(container));
   app.use('/authentications', authentications(container));
   app.use('/threads', threads(container));
