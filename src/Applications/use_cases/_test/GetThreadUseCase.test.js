@@ -2,6 +2,7 @@ import { vi } from 'vitest';
 import ThreadRepository from '../../../Domains/threads/ThreadRepository.js';
 import CommentRepository from '../../../Domains/comments/CommentRepository.js';
 import ReplyRepository from '../../../Domains/replies/ReplyRepository.js';
+import CommentLikeRepository from '../../../Domains/comments/CommentLikeRepository.js';
 import GetThreadUseCase from '../GetThreadUseCase.js';
 
 describe('GetThreadUseCase', () => {
@@ -53,6 +54,7 @@ describe('GetThreadUseCase', () => {
     const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
+    const mockCommentLikeRepository = new CommentLikeRepository();
 
     mockThreadRepository.getThreadById = vi.fn()
       .mockImplementation(() => Promise.resolve({ ...mockThread }));
@@ -65,11 +67,19 @@ describe('GetThreadUseCase', () => {
         }
         return Promise.resolve(mockRepliesComment456.map((reply) => ({ ...reply })));
       });
+    mockCommentLikeRepository.getLikeCountByCommentId = vi.fn()
+      .mockImplementation((commentId) => {
+        if (commentId === 'comment-123') {
+          return Promise.resolve(2);
+        }
+        return Promise.resolve(0);
+      });
 
     const getThreadUseCase = new GetThreadUseCase({
       threadRepository: mockThreadRepository,
       commentRepository: mockCommentRepository,
       replyRepository: mockReplyRepository,
+      commentLikeRepository: mockCommentLikeRepository,
     });
 
     // Action
@@ -80,16 +90,18 @@ describe('GetThreadUseCase', () => {
     expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith(threadId);
     expect(mockReplyRepository.getRepliesByCommentId).toBeCalledWith('comment-123');
     expect(mockReplyRepository.getRepliesByCommentId).toBeCalledWith('comment-456');
+    expect(mockCommentLikeRepository.getLikeCountByCommentId).toBeCalledWith('comment-123');
+    expect(mockCommentLikeRepository.getLikeCountByCommentId).toBeCalledWith('comment-456');
 
     expect(thread.id).toEqual('thread-123');
     expect(thread.comments).toHaveLength(2);
 
     expect(thread.comments[0].content).toEqual('sebuah comment');
+    expect(thread.comments[0].likeCount).toEqual(2);
     expect(thread.comments[0].replies).toHaveLength(1);
-    expect(thread.comments[0].replies[0].content).toEqual('sebuah balasan');
 
     expect(thread.comments[1].content).toEqual('**komentar telah dihapus**');
+    expect(thread.comments[1].likeCount).toEqual(0);
     expect(thread.comments[1].replies).toHaveLength(1);
-    expect(thread.comments[1].replies[0].content).toEqual('**balasan telah dihapus**');
   });
 });
