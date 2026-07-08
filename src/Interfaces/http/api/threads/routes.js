@@ -1,0 +1,13 @@
+import express from 'express';
+import authenticate from '../../../../Infrastructures/http/middlewares/authenticate.js';
+
+const routes = (controller) => {
+  const router = express.Router();
+
+  router.post('/', authenticate, controller.postThread);
+  router.get('/:threadId', controller.getThread);
+
+  return router;
+};
+
+export default routes;
