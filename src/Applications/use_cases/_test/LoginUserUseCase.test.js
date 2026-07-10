@@ -7,6 +7,31 @@ import LoginUserUseCase from '../LoginUserUseCase.js';
 import NewAuth from '../../../Domains/authentications/entities/NewAuth.js';
 
 describe('LoginUserUseCase', () => {
+  it('should throw error if use case payload not contain needed property', async () => {
+    // Arrange
+    const useCasePayload = {
+      username: 'dicoding',
+    };
+    const loginUserUseCase = new LoginUserUseCase({});
+
+    // Action & Assert
+    await expect(loginUserUseCase.execute(useCasePayload))
+      .rejects.toThrowError('LOGIN_USER_USE_CASE.NOT_CONTAIN_NEEDED_PROPERTY');
+  });
+
+  it('should throw error if username or password not string', async () => {
+    // Arrange
+    const useCasePayload = {
+      username: 123,
+      password: 'secret',
+    };
+    const loginUserUseCase = new LoginUserUseCase({});
+
+    // Action & Assert
+    await expect(loginUserUseCase.execute(useCasePayload))
+      .rejects.toThrowError('LOGIN_USER_USE_CASE.NOT_MEET_DATA_TYPE_SPECIFICATION');
+  });
+
   it('should orchestrating the login action correctly', async () => {
     // Arrange
     const useCasePayload = {

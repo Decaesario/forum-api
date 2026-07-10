@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^4.1.9",
     "@vitest/eslint-plugin": "^1.6.21",
     "eslint": "^10.6.0",
     "globals": "^17.7.0",
